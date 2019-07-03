@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "4.14.0",
+    "express-serve-static-core": "^0.1.1",
+    "jsonwebtoken": "^7.1.9"
+  },
+  "scripts": {
+    "start": "node ./dist/server.js"
+  },
+  "devDependencies": {
+    "chai": "^3.4.0",
+    "chai-http": "3.0.0",
+    "es6-promise": "3.3.1",
+    "event-stream": "3.3.4",
+    "mocha": "2.2.5",
+    "nconf": "0.8.4",
+    "shortid": "2.2.6",
+    "sinon": "1.17.6"
+  }
+}
