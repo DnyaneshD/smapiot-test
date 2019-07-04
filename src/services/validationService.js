@@ -1,5 +1,3 @@
-function isValid(token) {
+export function isValid(token) {
   return true;
 }
-
-module.exports = isValid;

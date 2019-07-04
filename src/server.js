@@ -1,8 +1,9 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const nconf = require("nconf");
-const isValid = require("./services/validationService.js");
-const prepareReport = require("./services/billingService.js");
+import express from "express";
+import bodyParser from "body-parser";
+import nconf from "nconf";
+import helmet from "helmet";
+import { isValid } from "./services/validationService.js";
+import { prepareReport } from "./services/billingService.js";
 
 const app = express();
 
@@ -21,6 +22,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(helmet());
+
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
@@ -36,7 +39,7 @@ app.route("/api/report/:year/:month").get((req, res) => {
     );
   } else {
     res.send("Invalid request");
-    res.status(401);
+    res.status(400);
   }
 });
 

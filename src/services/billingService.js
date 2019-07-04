@@ -1,25 +1,24 @@
-const axios = require("axios");
+import { fetchRequests } from "./requestsService.js";
+import {
+  isCurrentMonth,
+  getDiffInDays,
+  getDaysOfCurrentMonth,
+  isEndOfMonth
+} from "./dateService";
 
-function prepareReport(year, month, token) {
+/**
+ * Prepare report based on parameters.
+ * @param {string} year
+ * @param {string} month
+ * @param {string} token
+ */
+export function prepareReport(year, month, token) {
   if (year && month && token) {
     return fetchRequests(year, month, token).then(res => {
       return processData(res);
     });
   }
   return "Invalid input";
-}
-
-function fetchRequests(year, month, token) {
-  return axios
-    .get(
-      `https://smapiot-requests.azurewebsites.net/api/requests/${year}/${month}?code=${token}`
-    )
-    .then(response => {
-      return response;
-    })
-    .catch(error => {
-      console.log(error);
-    });
 }
 
 function processData(res) {
@@ -39,10 +38,34 @@ function processData(res) {
     }
 
     if (!requestsPerServiceNames[element.serviceName]) {
-      requestsPerServiceNames[element.serviceName] = 1;
+      requestsPerServiceNames[element.serviceName] = {
+        numberOfRequests: 1,
+        startDate: new Date(element.requested),
+        endDate: new Date(element.requested),
+        actualPrice: 0,
+        estimatedPriceMonth: 0
+      };
     } else {
-      requestsPerServiceNames[element.serviceName] =
-        requestsPerServiceNames[element.serviceName] + 1;
+      requestsPerServiceNames[element.serviceName].numberOfRequests =
+        requestsPerServiceNames[element.serviceName].numberOfRequests + 1;
+
+      if (
+        new Date(element.requested) <
+        requestsPerServiceNames[element.serviceName].startDate
+      ) {
+        requestsPerServiceNames[element.serviceName].startDate = new Date(
+          element.requested
+        );
+      }
+
+      if (
+        new Date(element.requested) >
+        requestsPerServiceNames[element.serviceName].endDate
+      ) {
+        requestsPerServiceNames[element.serviceName].endDate = new Date(
+          element.requested
+        );
+      }
     }
   }
 
@@ -51,8 +74,32 @@ function processData(res) {
     endDate: endDate,
     subscription: "",
     totalNumberOfRequests: totalRequests,
-    requestsPerServiceNames: requestsPerServiceNames
+    requestsPerServiceNames: calculateCost(requestsPerServiceNames)
   };
 }
 
-module.exports = prepareReport;
+function calculateCost(requestsPerServiceNames) {
+  for (const key in requestsPerServiceNames) {
+    if (requestsPerServiceNames.hasOwnProperty(key)) {
+      const element = requestsPerServiceNames[key];
+      element.actualPrice = element.numberOfRequests * 2;
+      element.estimatedPriceMonth = estimateTheCost(
+        element.startDate,
+        element.endDate,
+        element.actualPrice
+      );
+    }
+  }
+
+  return requestsPerServiceNames;
+}
+
+function estimateTheCost(startDate, endDate, actualPrice) {
+  if (isCurrentMonth(endDate) && !isEndOfMonth(endDate)) {
+    return (
+      (getDaysOfCurrentMonth() * actualPrice) /
+      getDiffInDays(endDate, startDate)
+    );
+  }
+  return 0;
+}
