@@ -12,9 +12,7 @@ To install all required packages.
 
 This command is required to run because ES6 has been for development and ES5 is required to run application on NodeJs.<br>
 
-### `npm start`
-
-### `f5` (For VS code)
+### `npm start` Or `f5` (For VS code)
 
 To run the application.
 
