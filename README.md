@@ -14,7 +14,7 @@ This command is required to run because ES6 has been for development and ES5 is 
 
 ### `npm start`
 
-### f5 (For VS code)
+### `f5` (For VS code)
 
 To run the application.
 
